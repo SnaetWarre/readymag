@@ -1,0 +1,409 @@
+<div id="rm-canva-deck" class="rm-canva-deck" aria-label="Animated broken heart scene"></div>
+
+<style>
+  .rm-canva-deck,
+  .rm-canva-deck * {
+    box-sizing: border-box;
+  }
+
+  .rm-canva-deck {
+    width: 100%;
+    overflow-x: hidden;
+    background: #a3294b;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  .rm-story {
+    height: var(--story-height, 420vh);
+    position: relative;
+    background: #a3294b;
+  }
+
+  .rm-stage {
+    --hand-x: 0px;
+    --break-progress: 0;
+    --open-progress: 0;
+    position: sticky;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: #a3294b;
+    isolation: isolate;
+  }
+
+  .rm-scene {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 1920px;
+    height: 1080px;
+    transform: translate(-50%, -50%) scale(var(--stage-scale, 1));
+    transform-origin: center;
+  }
+
+  .rm-heart-wrap {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 5;
+    width: 820px;
+    aspect-ratio: 200 / 141;
+    transform: translate(-50%, -53%);
+    transform-origin: center;
+  }
+
+  .rm-illustration {
+    position: absolute;
+    inset: 0;
+    will-change: opacity, transform;
+  }
+
+  .rm-heart-half {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transform-origin: center;
+    will-change: transform;
+  }
+
+  .rm-heart-base {
+    z-index: 1;
+    opacity: 1;
+    pointer-events: none;
+    will-change: opacity;
+  }
+
+  .rm-heart-left,
+  .rm-heart-right {
+    z-index: 2;
+  }
+
+  .rm-heart-left {
+    clip-path: polygon(0 0, 44% 0, 42.5% 16%, 46% 31%, 43% 45%, 46.5% 60%, 42% 75%, 44.5% 100%, 0 100%);
+  }
+
+  .rm-heart-right {
+    clip-path: polygon(44% 0, 100% 0, 100% 100%, 44.5% 100%, 42% 75%, 46.5% 60%, 43% 45%, 46% 31%, 42.5% 16%);
+  }
+
+  .rm-crack {
+    position: absolute;
+    z-index: 3;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    opacity: var(--crack-opacity, 0);
+    pointer-events: none;
+    -webkit-mask-image: var(--heart-url);
+    mask-image: var(--heart-url);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+  }
+
+  .rm-crack-segment {
+    fill: none;
+    stroke: #8f2949;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+    filter: drop-shadow(0 2px 0 rgba(255, 158, 189, 0.35));
+  }
+
+  .rm-phone {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 6;
+    width: 270px;
+    height: 540px;
+    background-image: var(--phones-url);
+    background-repeat: no-repeat;
+    background-size: 200% 100%;
+    filter: drop-shadow(0 18px 22px rgba(88, 15, 43, 0.2));
+    transform-origin: center;
+    will-change: transform;
+  }
+
+  .rm-phone-left {
+    background-position: right center;
+  }
+
+  .rm-phone-right {
+    background-position: left center;
+  }
+
+  .rm-hand {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 8;
+    display: block;
+    height: auto;
+    transform-origin: center;
+    will-change: transform;
+  }
+
+  .rm-hand-left {
+    width: 560px;
+  }
+
+  .rm-hand-right {
+    width: 560px;
+  }
+
+  .rm-title {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 4;
+    margin: 0;
+    max-width: 620px;
+    color: #fff7fb;
+    font-size: 76px;
+    font-weight: 800;
+    line-height: 0.92;
+    text-align: center;
+    letter-spacing: 0;
+    text-wrap: balance;
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(28px) scale(0.96);
+    text-shadow: 0 10px 30px rgba(91, 17, 47, 0.28);
+    will-change: opacity, transform;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rm-story {
+      height: 100vh;
+    }
+
+    .rm-stage {
+      position: relative;
+    }
+
+    .rm-title {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+</style>
+
+<script>
+  (() => {
+    const CONFIG = {
+      title: "YOUR WEBSITE TITLE",
+      desktopWidth: 1920,
+      desktopHeight: 1080,
+      leftHandRotation: 154,
+      storyHeightVh: 620,
+    };
+
+    const ASSETS = {
+      heart: "assets/layers/heart.png",
+      phones: "assets/layers/phones.png",
+      leftHand: "assets/layers/hand-left.png",
+    };
+
+    const CRACK_POINTS = [
+      [46, 31],
+      [43, 45],
+      [46.5, 60],
+      [42, 75],
+      [44.5, 100],
+    ];
+
+    const CRACK_X_OFFSET = 0;
+    const CRACK_SEGMENTS = 90;
+
+    const deck = document.querySelector("#rm-canva-deck");
+    const clamp = (value, min = 0, max = 1) => Math.min(Math.max(value, min), max);
+    const lerp = (from, to, progress) => from + (to - from) * progress;
+    const smoothstep = (start, end, value) => {
+      const x = clamp((value - start) / (end - start));
+      return x * x * (3 - 2 * x);
+    };
+
+    function createImage(className, src, alt = "") {
+      const img = document.createElement("img");
+      img.className = className;
+      img.src = src;
+      img.alt = alt;
+      return img;
+    }
+
+    function getPolylinePoint(points, targetLength) {
+      let walked = 0;
+
+      for (let i = 0; i < points.length - 1; i += 1) {
+        const [x1, y1] = points[i];
+        const [x2, y2] = points[i + 1];
+        const segmentLength = Math.hypot(x2 - x1, y2 - y1);
+
+        if (walked + segmentLength >= targetLength) {
+          const localProgress = (targetLength - walked) / segmentLength;
+          return [
+            lerp(x1, x2, localProgress) + CRACK_X_OFFSET,
+            lerp(y1, y2, localProgress),
+          ];
+        }
+
+        walked += segmentLength;
+      }
+
+      const [x, y] = points[points.length - 1];
+      return [x + CRACK_X_OFFSET, y];
+    }
+
+    function createCrackSegments(svg) {
+      const totalLength = CRACK_POINTS.reduce((sum, point, index) => {
+        if (index === CRACK_POINTS.length - 1) return sum;
+        const next = CRACK_POINTS[index + 1];
+        return sum + Math.hypot(next[0] - point[0], next[1] - point[1]);
+      }, 0);
+
+      const segments = [];
+
+      for (let i = 0; i < CRACK_SEGMENTS; i += 1) {
+        const start = getPolylinePoint(CRACK_POINTS, (i / CRACK_SEGMENTS) * totalLength);
+        const end = getPolylinePoint(CRACK_POINTS, ((i + 1) / CRACK_SEGMENTS) * totalLength);
+        const segment = document.createElementNS("http://www.w3.org/2000/svg", "path");
+
+        segment.classList.add("rm-crack-segment");
+        segment.setAttribute("d", `M${start[0]} ${start[1]} L${end[0]} ${end[1]}`);
+        segment.style.opacity = 0;
+        svg.append(segment);
+        segments.push(segment);
+      }
+
+      return segments;
+    }
+
+    function createScene() {
+      const story = document.createElement("section");
+      story.className = "rm-story";
+      story.style.setProperty("--story-height", `${CONFIG.storyHeightVh}vh`);
+
+      const stage = document.createElement("div");
+      stage.className = "rm-stage";
+      stage.style.setProperty("--phones-url", `url("${ASSETS.phones}")`);
+      stage.style.setProperty("--heart-url", `url("${ASSETS.heart}")`);
+
+      const scene = document.createElement("div");
+      scene.className = "rm-scene";
+
+      const title = document.createElement("h1");
+      title.className = "rm-title";
+      title.textContent = CONFIG.title;
+
+      const illustration = document.createElement("div");
+      illustration.className = "rm-illustration";
+
+      const heartWrap = document.createElement("div");
+      heartWrap.className = "rm-heart-wrap";
+
+      const heartBase = createImage("rm-heart-half rm-heart-base", ASSETS.heart);
+      const heartLeft = createImage("rm-heart-half rm-heart-left", ASSETS.heart);
+      const heartRight = createImage("rm-heart-half rm-heart-right", ASSETS.heart);
+
+      const crack = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      crack.classList.add("rm-crack");
+      crack.setAttribute("viewBox", "0 0 100 100");
+      crack.setAttribute("preserveAspectRatio", "none");
+      crack.setAttribute("aria-hidden", "true");
+
+      const crackSegments = createCrackSegments(crack);
+
+      heartWrap.append(heartBase, heartLeft, heartRight, crack);
+
+      const phoneLeft = document.createElement("div");
+      phoneLeft.className = "rm-phone rm-phone-left";
+      const phoneRight = document.createElement("div");
+      phoneRight.className = "rm-phone rm-phone-right";
+
+      const handLeft = createImage("rm-hand rm-hand-left", ASSETS.leftHand);
+      const handRight = createImage("rm-hand rm-hand-right", ASSETS.leftHand);
+
+      illustration.append(heartWrap, phoneLeft, phoneRight, handLeft, handRight);
+      scene.append(illustration, title);
+      stage.append(scene);
+      story.append(stage);
+      deck.append(story);
+
+      return { story, stage, scene, illustration, title, heartBase, heartLeft, heartRight, crackSegments, phoneLeft, phoneRight, handLeft, handRight };
+    }
+
+    const elements = createScene();
+    let ticking = false;
+
+    function transformCentered(x, y, rotation, scale = 1, flipX = false) {
+      const mirror = flipX ? " scaleX(-1)" : "";
+      return `translate(-50%, -50%) translate(${x}px, ${y}px) rotate(${rotation}deg) scale(${scale})${mirror}`;
+    }
+
+    function updateCrack(crackProgress, openProgress) {
+      const crackOpacity = crackProgress > 0.02 && openProgress <= 0.001 ? 1 : 0;
+      elements.stage.style.setProperty("--crack-opacity", crackOpacity);
+
+      elements.crackSegments.forEach((segment, index) => {
+        const segmentStart = index / elements.crackSegments.length;
+        const segmentFade = clamp((crackProgress - segmentStart) * 18);
+        segment.style.opacity = segmentFade;
+      });
+    }
+
+    function updateScene() {
+      ticking = false;
+      const rect = elements.story.getBoundingClientRect();
+      const total = Math.max(elements.story.offsetHeight - window.innerHeight, 1);
+      const stageScale = Math.min(window.innerWidth / CONFIG.desktopWidth, window.innerHeight / CONFIG.desktopHeight);
+      const progress = clamp(-rect.top / total);
+      const handTravel = clamp((progress - 0.12) / (0.72 - 0.12));
+      const crack = smoothstep(0.12, 0.72, progress);
+      const open = smoothstep(0.72, 1, progress);
+      const titleIn = smoothstep(0.82, 1, progress);
+      const outro = smoothstep(0.9, 1, progress);
+      const outroFade = smoothstep(0.82, 1, outro);
+      const handWave = Math.sin(handTravel * Math.PI * 5) * 42 * (1 - open);
+
+      elements.stage.style.setProperty("--hand-x", `${handWave}px`);
+      elements.stage.style.setProperty("--break-progress", crack);
+      elements.stage.style.setProperty("--open-progress", open);
+      elements.stage.style.setProperty("--stage-scale", stageScale);
+      elements.scene.style.transform = `translate(-50%, -50%) scale(${stageScale})`;
+      elements.illustration.style.opacity = 1 - outroFade;
+      elements.illustration.style.transform = "none";
+
+      elements.heartLeft.style.transform = `translateX(${lerp(0, -240, open) - lerp(0, 1680, outro)}px) rotate(${lerp(0, -8, open) - lerp(0, 6, outro)}deg)`;
+      elements.heartRight.style.transform = `translateX(${lerp(0, 240, open) + lerp(0, 1680, outro)}px) rotate(${lerp(0, 8, open) + lerp(0, 6, outro)}deg)`;
+      elements.heartBase.style.opacity = 1 - smoothstep(0, 0.04, open);
+      elements.phoneLeft.style.transform = transformCentered(lerp(-420, -620, open) - lerp(0, 1520, outro), 40, lerp(-8, -13, open));
+      elements.phoneRight.style.transform = transformCentered(lerp(420, 620, open) + lerp(0, 1520, outro), 35, lerp(8, 13, open));
+      elements.handLeft.style.transform = transformCentered(lerp(-660, -860, open) - lerp(0, 1620, outro) + handWave, 295, CONFIG.leftHandRotation + lerp(0, -4, open));
+      elements.handRight.style.transform = transformCentered(lerp(578, 778, open) + lerp(0, 1620, outro) - handWave, 419, lerp(214, 218, open), 1, true);
+      elements.title.style.opacity = titleIn;
+      elements.title.style.transform = `translate(-50%, -50%) translateY(${lerp(28, 0, titleIn)}px) scale(${lerp(0.96, 1, titleIn)})`;
+
+      updateCrack(crack, open);
+    }
+
+    function requestUpdate() {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(updateScene);
+      }
+    }
+
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+    window.addEventListener("load", requestUpdate);
+    requestUpdate();
+  })();
+</script>
