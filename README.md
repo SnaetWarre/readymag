@@ -25,7 +25,7 @@ In `script.js`, edit:
 
 ```js
 const CONFIG = {
-  title: "YOUR WEBSITE TITLE",
+  title: "De downfall van datingapps:\nHeeft online daten nog een toekomst?",
 };
 ```
 
@@ -33,6 +33,6 @@ For Readymag, edit the same `CONFIG.title` value inside `readymag-embed.html`.
 
 ## Readymag Use
 
-Upload the four required images so the paths in the `ASSETS` object resolve, or replace each path with the hosted asset URL from Readymag.
+Upload the required images so the paths in the `ASSETS` object resolve, or replace each path with the hosted asset URL from Readymag.
 
 Then paste the full contents of `readymag-embed.html` into a Readymag Embed/code widget.

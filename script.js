@@ -1,5 +1,5 @@
 const CONFIG = {
-  title: "YOUR WEBSITE TITLE",
+  title: "De downfall van datingapps:\nHeeft online daten nog een toekomst?",
   desktopWidth: 1920,
   desktopHeight: 1080,
   leftHandRotation: 154,
@@ -12,6 +12,7 @@ if (urlTitle) {
   CONFIG.title = urlTitle;
 }
 const shouldAutoplay = params.get("autoplay") === "1";
+const shouldLoop = params.get("loop") === "1";
 
 const ASSETS = {
   heart: "assets/layers/heart.png",
@@ -255,6 +256,7 @@ function requestUpdate() {
 if (shouldAutoplay) {
   let start = 0;
   const duration = Number(params.get("duration") || 9000);
+  const loopDelay = Number(params.get("loopDelay") || 2500);
 
   function autoplay(timestamp) {
     if (!start) start = timestamp;
@@ -263,6 +265,11 @@ if (shouldAutoplay) {
 
     if (progress < 1) {
       requestAnimationFrame(autoplay);
+    } else if (shouldLoop) {
+      window.setTimeout(() => {
+        start = 0;
+        requestAnimationFrame(autoplay);
+      }, loopDelay);
     }
   }
 
