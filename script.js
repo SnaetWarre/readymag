@@ -6,6 +6,12 @@ const CONFIG = {
   storyHeightVh: 620,
 };
 
+const params = new URLSearchParams(window.location.search);
+const urlTitle = params.get("title");
+if (urlTitle) {
+  CONFIG.title = urlTitle;
+}
+
 const ASSETS = {
   heart: "assets/layers/heart.png",
   phones: "assets/layers/phones.png",
