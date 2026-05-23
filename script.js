@@ -265,8 +265,9 @@ function requestUpdate() {
 if (shouldAutoplay) {
   let start = 0;
   let autoplayProgress = 0;
-  const duration = Number(params.get("duration") || 9000);
-  const loopDelay = Number(params.get("loopDelay") || 2500);
+  const startDelay = Number(params.get("startDelay") || 500);
+  const duration = Number(params.get("duration") || 8000);
+  const loopDelay = Number(params.get("loopDelay") || 3000);
 
   function autoplay(timestamp) {
     if (!start) start = timestamp;
@@ -285,7 +286,8 @@ if (shouldAutoplay) {
   }
 
   window.addEventListener("resize", () => updateScene(autoplayProgress));
-  requestAnimationFrame(autoplay);
+  updateScene(0);
+  window.setTimeout(() => requestAnimationFrame(autoplay), startDelay);
 } else {
   window.addEventListener("scroll", requestUpdate, { passive: true });
   window.addEventListener("resize", requestUpdate);
