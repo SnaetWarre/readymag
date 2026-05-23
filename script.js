@@ -11,6 +11,7 @@ const urlTitle = params.get("title");
 if (urlTitle) {
   CONFIG.title = urlTitle;
 }
+const shouldAutoplay = params.get("autoplay") === "1";
 
 const ASSETS = {
   heart: "assets/layers/heart.png",
@@ -181,7 +182,7 @@ function updateCrack(crackProgress, openProgress) {
   });
 }
 
-function updateScene() {
+function updateScene(progressOverride) {
   ticking = false;
 
   const rect = elements.story.getBoundingClientRect();
@@ -190,7 +191,7 @@ function updateScene() {
     window.innerWidth / CONFIG.desktopWidth,
     window.innerHeight / CONFIG.desktopHeight
   );
-  const progress = clamp(-rect.top / total);
+  const progress = progressOverride ?? clamp(-rect.top / total);
 
   const handTravel = clamp((progress - 0.12) / (0.72 - 0.12));
   const crack = smoothstep(0.12, 0.72, progress);
@@ -243,13 +244,33 @@ function updateScene() {
 }
 
 function requestUpdate() {
+  if (shouldAutoplay) return;
+
   if (!ticking) {
     ticking = true;
     requestAnimationFrame(updateScene);
   }
 }
 
-window.addEventListener("scroll", requestUpdate, { passive: true });
-window.addEventListener("resize", requestUpdate);
-window.addEventListener("load", requestUpdate);
-requestUpdate();
+if (shouldAutoplay) {
+  let start = 0;
+  const duration = Number(params.get("duration") || 9000);
+
+  function autoplay(timestamp) {
+    if (!start) start = timestamp;
+    const progress = clamp((timestamp - start) / duration);
+    updateScene(progress);
+
+    if (progress < 1) {
+      requestAnimationFrame(autoplay);
+    }
+  }
+
+  window.addEventListener("resize", () => updateScene());
+  requestAnimationFrame(autoplay);
+} else {
+  window.addEventListener("scroll", requestUpdate, { passive: true });
+  window.addEventListener("resize", requestUpdate);
+  window.addEventListener("load", requestUpdate);
+  requestUpdate();
+}
