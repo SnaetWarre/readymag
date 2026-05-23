@@ -211,6 +211,7 @@
       desktopHeight: 1080,
       leftHandRotation: 154,
       storyHeightVh: 620,
+      assetScale: 1.25,
     };
 
     const params = new URLSearchParams(window.location.search);
@@ -394,7 +395,7 @@
       elements.stage.style.setProperty("--stage-scale", stageScale);
       elements.scene.style.transform = `translate(-50%, -50%) scale(${stageScale})`;
       elements.illustration.style.opacity = 1 - outroFade;
-      elements.illustration.style.transform = "none";
+      elements.illustration.style.transform = `scale(${CONFIG.assetScale})`;
 
       elements.heartLeft.style.transform = `translateX(${lerp(0, -240, open) - lerp(0, 1680, outro)}px) rotate(${lerp(0, -8, open) - lerp(0, 6, outro)}deg)`;
       elements.heartRight.style.transform = `translateX(${lerp(0, 240, open) + lerp(0, 1680, outro)}px) rotate(${lerp(0, 8, open) + lerp(0, 6, outro)}deg)`;
