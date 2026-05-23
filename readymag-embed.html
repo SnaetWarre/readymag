@@ -36,6 +36,16 @@
     isolation: isolate;
   }
 
+  .rm-canva-deck.rm-autoplay-mode,
+  .rm-canva-deck.rm-autoplay-mode .rm-story {
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .rm-canva-deck.rm-autoplay-mode .rm-stage {
+    position: relative;
+  }
+
   .rm-scene {
     position: absolute;
     left: 50%;
@@ -240,6 +250,10 @@
     const CRACK_SEGMENTS = 90;
 
     const deck = document.querySelector("#rm-canva-deck");
+
+    if (shouldAutoplay) {
+      deck.classList.add("rm-autoplay-mode");
+    }
     const clamp = (value, min = 0, max = 1) => Math.min(Math.max(value, min), max);
     const lerp = (from, to, progress) => from + (to - from) * progress;
     const smoothstep = (start, end, value) => {
@@ -305,7 +319,7 @@
     function createScene() {
       const story = document.createElement("section");
       story.className = "rm-story";
-      story.style.setProperty("--story-height", `${CONFIG.storyHeightVh}vh`);
+      story.style.setProperty("--story-height", shouldAutoplay ? "100vh" : `${CONFIG.storyHeightVh}vh`);
 
       const stage = document.createElement("div");
       stage.className = "rm-stage";
@@ -421,12 +435,14 @@
 
     if (shouldAutoplay) {
       let start = 0;
+      let autoplayProgress = 0;
       const duration = Number(params.get("duration") || 9000);
       const loopDelay = Number(params.get("loopDelay") || 2500);
 
       function autoplay(timestamp) {
         if (!start) start = timestamp;
         const progress = clamp((timestamp - start) / duration);
+        autoplayProgress = progress;
         updateScene(progress);
 
         if (progress < 1) {
@@ -439,7 +455,7 @@
         }
       }
 
-      window.addEventListener("resize", () => updateScene());
+      window.addEventListener("resize", () => updateScene(autoplayProgress));
       requestAnimationFrame(autoplay);
     } else {
       window.addEventListener("scroll", requestUpdate, { passive: true });

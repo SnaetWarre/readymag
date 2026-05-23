@@ -15,6 +15,10 @@ if (urlTitle) {
 const shouldAutoplay = params.get("autoplay") === "1";
 const shouldLoop = params.get("loop") === "1";
 
+if (shouldAutoplay) {
+  document.documentElement.classList.add("rm-autoplay-mode");
+}
+
 const ASSETS = {
   heart: "assets/layers/heart.png",
   phones: "assets/layers/phones.png",
@@ -33,6 +37,10 @@ const CRACK_X_OFFSET = 0;
 const CRACK_SEGMENTS = 90;
 
 const deck = document.querySelector("#rm-canva-deck");
+
+if (shouldAutoplay) {
+  deck.classList.add("rm-autoplay-mode");
+}
 
 const clamp = (value, min = 0, max = 1) => Math.min(Math.max(value, min), max);
 const lerp = (from, to, progress) => from + (to - from) * progress;
@@ -99,7 +107,7 @@ function createCrackSegments(svg) {
 function createScene() {
   const story = document.createElement("section");
   story.className = "rm-story";
-  story.style.setProperty("--story-height", `${CONFIG.storyHeightVh}vh`);
+  story.style.setProperty("--story-height", shouldAutoplay ? "100vh" : `${CONFIG.storyHeightVh}vh`);
 
   const stage = document.createElement("div");
   stage.className = "rm-stage";
@@ -256,12 +264,14 @@ function requestUpdate() {
 
 if (shouldAutoplay) {
   let start = 0;
+  let autoplayProgress = 0;
   const duration = Number(params.get("duration") || 9000);
   const loopDelay = Number(params.get("loopDelay") || 2500);
 
   function autoplay(timestamp) {
     if (!start) start = timestamp;
     const progress = clamp((timestamp - start) / duration);
+    autoplayProgress = progress;
     updateScene(progress);
 
     if (progress < 1) {
@@ -274,7 +284,7 @@ if (shouldAutoplay) {
     }
   }
 
-  window.addEventListener("resize", () => updateScene());
+  window.addEventListener("resize", () => updateScene(autoplayProgress));
   requestAnimationFrame(autoplay);
 } else {
   window.addEventListener("scroll", requestUpdate, { passive: true });

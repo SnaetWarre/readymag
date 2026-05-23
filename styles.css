@@ -19,6 +19,12 @@ body {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
+html.rm-autoplay-mode,
+html.rm-autoplay-mode body {
+  height: 100%;
+  overflow: hidden;
+}
+
 .rm-canva-deck {
   width: 100%;
   background: #9D2D49;
@@ -41,6 +47,19 @@ body {
   overflow: hidden;
   background: #9D2D49;
   isolation: isolate;
+}
+
+html.rm-autoplay-mode .rm-canva-deck,
+.rm-canva-deck.rm-autoplay-mode,
+html.rm-autoplay-mode .rm-story,
+.rm-canva-deck.rm-autoplay-mode .rm-story {
+  height: 100vh;
+  overflow: hidden;
+}
+
+html.rm-autoplay-mode .rm-stage,
+.rm-canva-deck.rm-autoplay-mode .rm-stage {
+  position: relative;
 }
 
 .rm-scene {
