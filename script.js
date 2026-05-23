@@ -267,7 +267,7 @@ if (shouldAutoplay) {
   let autoplayProgress = 0;
   const startDelay = Number(params.get("startDelay") || 100);
   const duration = Number(params.get("duration") || 6000);
-  const loopDelay = Number(params.get("loopDelay") || 130000);
+  const loopDelay = Number(params.get("loopDelay") || 15000);
 
   function autoplay(timestamp) {
     if (!start) start = timestamp;
